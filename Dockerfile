@@ -6,7 +6,6 @@ ENV PYTHONPATH='/'
 
 COPY ./poetry.lock /
 COPY ./pyproject.toml /
-COPY ./env /
 
 RUN apt-get update -y && apt-get install curl -y \
     && curl -sSL https://install.python-poetry.org | python3 - \
