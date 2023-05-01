@@ -1,8 +1,9 @@
-from app.schemas.category import Category
-from app.schemas.product import Product
-from app.db.models import Product as ProductModel, Category as CategoryModel
-from app.use_cases.product_use_cases import ProductUseCases
+import pytest
 
+from app.schemas.product import Product
+from app.db.models import Product as ProductModel
+from app.use_cases.product_use_cases import ProductUseCases
+from fastapi.exceptions import HTTPException
 
 def test_add_product_uc(db_session):
     uc = ProductUseCases(db_session)
@@ -27,3 +28,16 @@ def test_add_product_uc(db_session):
     db_session.delete(products_on_db)
     db_session.commit()
 
+
+def test_add_product_data_invalid(db_session):
+    uc = ProductUseCases(db_session)
+
+    product = Product(
+        name='Camisa Mike',
+        slug='camisa-mike',
+        price=22.99,
+        stock=50,
+    )
+
+    with pytest.raises(HTTPException):
+        uc.add_product(product=product, category_slug="qualquer-slug")
