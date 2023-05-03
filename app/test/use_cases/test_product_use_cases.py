@@ -81,3 +81,9 @@ def test_delete_product(db_session, product_on_db):
     products_on_db = db_session.query(ProductModel).all()
 
     assert len(products_on_db) == 0
+
+
+def test_delete_product_invalid_id(db_session):
+    uc = ProductUseCases(db_session=db_session)
+    with pytest.raises(HTTPException):
+        uc.delete_product(id=9999)
