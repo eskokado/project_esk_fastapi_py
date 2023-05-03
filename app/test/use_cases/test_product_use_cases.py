@@ -61,3 +61,14 @@ def test_update_product(db_session, product_on_db):
     assert product_updated_on_db.price == product.price
     assert product_updated_on_db.stock == product.stock
 
+
+def test_update_product_invalid_id(db_session, product_on_db):
+    product = Product(
+        name='Camisa Mike',
+        slug='camisa-mike',
+        price=22.99,
+        stock=50,
+    )
+    uc = ProductUseCases(db_session=db_session)
+    with pytest.raises(HTTPException):
+        uc.update_product(id=9999, product=product)
