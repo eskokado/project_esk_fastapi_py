@@ -67,3 +67,16 @@ def test_update_product_route(db_session, product_on_db):
     assert product_on_db.slug == "updated-camisa"
     assert product_on_db.price == 23.99
     assert product_on_db.stock == 100
+
+
+def test_update_product_route_invalid_id(db_session):
+    body = {
+        "name": "Updated camisa",
+        "slug": "updated-camisa",
+        "price": 23.99,
+        "stock": 100
+    }
+
+    response = client.put(f'/products/update/99999', json=body)
+
+    assert response.status_code == status.HTTP_404_NOT_FOUND
