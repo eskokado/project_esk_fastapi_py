@@ -1,6 +1,7 @@
 import pytest
 from app.db.connection import Session
-from app.db.models import Category as CategoryModels
+from app.db.models import Category as CategoryModel
+from app.db.models import Product as ProductModel
 
 
 @pytest.fixture()
@@ -15,10 +16,10 @@ def db_session():
 @pytest.fixture()
 def categories_on_db(db_session):
     categories = [
-        CategoryModels(name='Roupa', slug='roupa'),
-        CategoryModels(name='Carro', slug='carro'),
-        CategoryModels(name='Itens de cozinha', slug='itens-de-cozinha'),
-        CategoryModels(name='Decoração', slug='decoracao'),
+        CategoryModel(name='Roupa', slug='roupa'),
+        CategoryModel(name='Carro', slug='carro'),
+        CategoryModel(name='Itens de cozinha', slug='itens-de-cozinha'),
+        CategoryModel(name='Decoração', slug='decoracao'),
     ]
 
     for category in categories:
@@ -33,3 +34,4 @@ def categories_on_db(db_session):
     for category in categories:
         db_session.delete(category)
     db_session.commit()
+
