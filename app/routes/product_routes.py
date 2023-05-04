@@ -42,3 +42,13 @@ def delete_product(
     uc.delete_product(id=id)
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.get("/list")
+def list_products(
+        db_session: Session = Depends(get_db_session)
+):
+    uc = ProductUseCases(db_session=db_session)
+    response = uc.list_products()
+
+    return response
