@@ -2,6 +2,8 @@ from fastapi.testclient import TestClient
 from fastapi import status
 from app.db.models import Product as ProductModel
 from app.main import app
+from app.use_cases.product_use_cases import ProductUseCases
+from app.db.models import Product
 
 client = TestClient(app)
 
@@ -78,5 +80,21 @@ def test_update_product_route_invalid_id(db_session):
     }
 
     response = client.put(f'/products/update/99999', json=body)
+
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+def test_delete_product_route(db_session, product_on_db):
+    response = client.delete(f'/products/delete/{product_on_db.id}')
+
+    assert response.status_code == status.HTTP_204_NO_CONTENT
+
+    product_on_db = db_session.query(ProductModel).all()
+
+    assert len(product_on_db) == 0
+
+
+def test_delete_product_route_invalid_id(db_session, product_on_db):
+    response = client.delete(f'/products/delete/{99999999999}')
 
     assert response.status_code == status.HTTP_404_NOT_FOUND

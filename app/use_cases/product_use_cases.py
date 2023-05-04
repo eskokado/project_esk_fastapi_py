@@ -1,5 +1,5 @@
 from app.db.connection import Session
-from app.schemas.product import Product
+from app.schemas.product import Product, ProductOutput
 from app.db.models import Product as ProductModel, Category as CategoryModel
 from fastapi.exceptions import HTTPException
 from fastapi import status
@@ -40,3 +40,15 @@ class ProductUseCases:
 
         self.db_session.delete(product_on_db)
         self.db_session.commit()
+
+    def list_products(self):
+        products_on_db = self.db_session.query(ProductModel).all()
+        products_output = [
+            self.serialize_product(product_model) for product_model in products_on_db
+        ]
+        return products_output
+
+    def serialize_product(self, product_model: ProductModel):
+        product_dict = product_model.__dict__
+        product_dict['category'] = product_model.category.__dict__
+        return ProductOutput(**product_dict)
