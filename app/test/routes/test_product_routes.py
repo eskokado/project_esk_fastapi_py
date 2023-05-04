@@ -93,3 +93,8 @@ def test_delete_product_route(db_session, product_on_db):
 
     assert len(product_on_db) == 0
 
+
+def test_delete_product_route_invalid_id(db_session, product_on_db):
+    response = client.delete(f'/products/delete/{99999999999}')
+
+    assert response.status_code == status.HTTP_404_NOT_FOUND
