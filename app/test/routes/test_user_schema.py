@@ -8,3 +8,8 @@ def test_user_schema():
         "username": "Edson",
         "password": "pass#"
     }
+
+
+def test_user_schema_invalid_schema():
+    with pytest.raises(ValueError):
+        user = User(username='Edsãon', password='pass#')
