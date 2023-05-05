@@ -118,3 +118,12 @@ def test_list_products_route(db_session, products_on_db):
             "slug": products_on_db[0].category.slug
         }
     }
+
+
+def test_list_products_with_search_route(db_session, products_on_db):
+    response = client.get(f'/products/list?search=carro')
+
+    assert response.status_code == status.HTTP_200_OK
+    data = response.json()
+
+    assert len(data) == 1
