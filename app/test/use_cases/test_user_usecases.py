@@ -25,3 +25,25 @@ def test_register_user(db_session):
     db_session.delete(user_on_db)
     db_session.commit()
 
+
+def test_register_user_username_already_exists(db_session):
+    user_on_db = UserModel(
+        username="Diogo",
+        password=crypt_context.hash('pass#')
+    )
+
+    db_session.add(user_on_db)
+    db_session.commit()
+
+    uc = UserUseCases(db_session)
+
+    user = User(
+        username='Diogo',
+        password=crypt_context.hash('pass#')
+    )
+
+    with pytest.raises(HTTPException):
+        uc.register_user(user=user)
+
+    db_session.delete(user_on_db)
+    db_session.commit()
