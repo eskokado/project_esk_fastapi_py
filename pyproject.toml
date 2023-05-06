@@ -16,6 +16,8 @@ alembic = "^1.10.4"
 python-decouple = "^3.8"
 httpx = "^0.24.0"
 ipdb = "^0.13.13"
+python-jose = "^3.3.0"
+passlib = "1.7.1"
 
 
 [tool.poetry.group.dev.dependencies]
