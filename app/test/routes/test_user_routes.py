@@ -50,3 +50,16 @@ def test_user_login_route(user_on_db):
     assert 'access_token' in data
     assert 'expires_at' in data
 
+
+def test_user_login_route_invalid_username(user_on_db):
+    body = {
+        'username': 'invalid',
+        'password': 'pass#'
+    }
+
+    headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+
+    response = client.post('/users/login', data=body, headers=headers)
+
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
