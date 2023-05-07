@@ -1,7 +1,8 @@
 import pytest
+from datetime import datetime
 from passlib.context import CryptContext
 from fastapi.exceptions import HTTPException
-from app.schemas.user import User
+from app.schemas.user import User, TokenData
 from app.db.models import User as UserModel
 from app.use_cases.user_use_cases import UserUseCases
 
@@ -47,3 +48,16 @@ def test_register_user_username_already_exists(db_session):
 
     db_session.delete(user_on_db)
     db_session.commit()
+
+
+def test_token_date():
+    expires_at = datetime.now()
+    token_data = TokenData(
+        access_token='token qualquer',
+        expires_at=expires_at
+    )
+
+    assert token_data.dict() == {
+        'access_token': 'token qualquer',
+        'expires_at': expires_at
+    }
