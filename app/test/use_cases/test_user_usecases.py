@@ -1,5 +1,5 @@
 import pytest
-from datetime import datetime
+from datetime import datetime, timedelta
 from passlib.context import CryptContext
 from fastapi.exceptions import HTTPException
 from app.schemas.user import User, TokenData
@@ -61,3 +61,16 @@ def test_token_date():
         'access_token': 'token qualquer',
         'expires_at': expires_at
     }
+
+
+def test_user_login(db_session, user_on_db):
+    uc = UserUseCases(db_session=db_session)
+
+    user = User(
+        username=user_on_db.username,
+        password='pass#'
+    )
+
+    token_data = uc.user_login(user=user, expires_in=30)
+
+    assert token_data.expires_at < datetime.utcnow() + timedelta(31)
