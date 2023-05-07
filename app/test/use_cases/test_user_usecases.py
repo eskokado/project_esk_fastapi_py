@@ -1,11 +1,16 @@
 import pytest
+from datetime import datetime, timedelta
 from passlib.context import CryptContext
+from jose import jwt
+from decouple import config
 from fastapi.exceptions import HTTPException
-from app.schemas.user import User
+from app.schemas.user import User, TokenData
 from app.db.models import User as UserModel
 from app.use_cases.user_use_cases import UserUseCases
 
 crypt_context = CryptContext(schemes=['sha256_crypt'])
+SECRET_KEY = config('SECRET_KEY')
+ALGORITHM = config('ALGORITHM')
 
 
 def test_register_user(db_session):
@@ -47,3 +52,80 @@ def test_register_user_username_already_exists(db_session):
 
     db_session.delete(user_on_db)
     db_session.commit()
+
+
+def test_token_date():
+    expires_at = datetime.now()
+    token_data = TokenData(
+        access_token='token qualquer',
+        expires_at=expires_at
+    )
+
+    assert token_data.dict() == {
+        'access_token': 'token qualquer',
+        'expires_at': expires_at
+    }
+
+
+def test_user_login(db_session, user_on_db):
+    uc = UserUseCases(db_session=db_session)
+
+    user = User(
+        username=user_on_db.username,
+        password='pass#'
+    )
+
+    token_data = uc.user_login(user=user, expires_in=30)
+
+    assert token_data.expires_at < datetime.utcnow() + timedelta(31)
+
+
+def test_user_login_invalid_username(db_session, user_on_db):
+    uc = UserUseCases(db_session=db_session)
+
+    user = User(
+        username='invalid',
+        password=user_on_db.password
+    )
+
+    with pytest.raises(HTTPException):
+        uc.user_login(user=user, expires_in=30)
+
+
+def test_user_login_invalid_password(db_session, user_on_db):
+    uc = UserUseCases(db_session=db_session)
+
+    user = User(
+        username=user_on_db.username,
+        password='invalid'
+    )
+
+    with pytest.raises(HTTPException):
+        uc.user_login(user=user, expires_in=30)
+
+
+def test_verify_token(db_session, user_on_db):
+    uc = UserUseCases(db_session=db_session)
+
+    data = {
+        'sub': user_on_db.username,
+        'exp': datetime.utcnow() + timedelta(minutes=30)
+    }
+
+    access_token = jwt.encode(data, SECRET_KEY, algorithm=ALGORITHM)
+
+    uc.verify_token(token=access_token)
+
+
+def test_verify_token_expired(db_session, user_on_db):
+    uc = UserUseCases(db_session=db_session)
+
+    data = {
+        'sub': user_on_db.username,
+        'exp': datetime.utcnow() - timedelta(minutes=30)
+    }
+
+    access_token = jwt.encode(data, SECRET_KEY, algorithm=ALGORITHM)
+
+    with pytest.raises(HTTPException):
+        uc.verify_token(token=access_token)

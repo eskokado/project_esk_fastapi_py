@@ -6,6 +6,8 @@ from app.use_cases.product_use_cases import ProductUseCases
 from app.db.models import Product
 
 client = TestClient(app)
+headers = {'Authorization': 'Bearer token'}
+client.headers = headers
 
 
 def test_add_product_route(db_session, categories_on_db):
