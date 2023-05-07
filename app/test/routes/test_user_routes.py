@@ -63,3 +63,15 @@ def test_user_login_route_invalid_username(user_on_db):
 
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
+
+def test_user_login_route_invalid_password(user_on_db):
+    body = {
+        'username': user_on_db.username,
+        'password': 'invalid'
+    }
+
+    headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+
+    response = client.post('/users/login', data=body, headers=headers)
+
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
