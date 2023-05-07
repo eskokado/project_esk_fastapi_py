@@ -74,3 +74,16 @@ def test_user_login(db_session, user_on_db):
     token_data = uc.user_login(user=user, expires_in=30)
 
     assert token_data.expires_at < datetime.utcnow() + timedelta(31)
+
+
+def test_user_login_invalid_username(db_session, user_on_db):
+    uc = UserUseCases(db_session=db_session)
+
+    user = User(
+        username='invalid',
+        password=user_on_db.password
+    )
+
+    with pytest.raises(HTTPException):
+        uc.user_login(user=user, expires_in=30)
+
