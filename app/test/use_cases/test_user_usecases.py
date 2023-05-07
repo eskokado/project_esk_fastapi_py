@@ -87,3 +87,14 @@ def test_user_login_invalid_username(db_session, user_on_db):
     with pytest.raises(HTTPException):
         uc.user_login(user=user, expires_in=30)
 
+
+def test_user_login_invalid_password(db_session, user_on_db):
+    uc = UserUseCases(db_session=db_session)
+
+    user = User(
+        username=user_on_db.username,
+        password='invalid'
+    )
+
+    with pytest.raises(HTTPException):
+        uc.user_login(user=user, expires_in=30)
