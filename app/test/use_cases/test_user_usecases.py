@@ -116,3 +116,16 @@ def test_verify_token(db_session, user_on_db):
 
     uc.verify_token(token=access_token)
 
+
+def test_verify_token_expired(db_session, user_on_db):
+    uc = UserUseCases(db_session=db_session)
+
+    data = {
+        'sub': user_on_db.username,
+        'exp': datetime.utcnow() - timedelta(minutes=30)
+    }
+
+    access_token = jwt.encode(data, SECRET_KEY, algorithm=ALGORITHM)
+
+    with pytest.raises(HTTPException):
+        uc.verify_token(token=access_token)
