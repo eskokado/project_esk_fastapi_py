@@ -16,9 +16,6 @@ def list_categories(page: int = 1, size: int = 50, limit: int = 50, offset: int 
     return list_categories_uc(page=page, size=size)
 
 
-add_pagination(router)
-
-
 @router.get('/list/sqlalchemy', response_model=Page[CategoryOutput])
 @router.get('/list/limit-offset/sqlalchemy', response_model=LimitOffsetPage[CategoryOutput])
 def list_categories_sqlalchemy(db_session: Session = Depends(get_db_session)):
