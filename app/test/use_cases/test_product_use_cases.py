@@ -1,9 +1,11 @@
+import ipdb
 import pytest
 
 from app.schemas.product import Product, ProductOutput
 from app.db.models import Product as ProductModel
 from app.use_cases.product_use_cases import ProductUseCases
 from fastapi.exceptions import HTTPException
+from fastapi_pagination import Page
 
 
 def test_add_product_uc(db_session, categories_on_db):
@@ -92,23 +94,24 @@ def test_delete_product_invalid_id(db_session):
 
 def test_list_products(db_session, products_on_db):
     uc = ProductUseCases(db_session=db_session)
-    products = uc.list_products()
+    page: Page = uc.list_products(page=1, size=2)
 
-    for product in products_on_db:
-        db_session.refresh(product)
+    assert 'items' in page.__dict__
+    assert page.size == 2
+    assert page.total == 2
+    assert page.page == 1
+    assert page.pages == 1
 
-    assert len(products) == 2
-    assert type(products[0]) == ProductOutput
-    assert products[0].name == products_on_db[0].name
-    assert products[0].category.name == products_on_db[0].category.name
+    assert page.items[0].name == products_on_db[0].name
+    assert page.items[0].category.name == products_on_db[0].category.name
 
 
 def test_list_products_with_search(db_session, products_on_db):
     uc = ProductUseCases(db_session=db_session)
-    products = uc.list_products(search='carro')
+    page = uc.list_products(search='carro')
 
-    for product in products_on_db:
-        db_session.refresh(product)
-
-    assert len(products) == 1
-    assert type(products[0]) == ProductOutput
+    assert 'items' in page.__dict__
+    assert page.size == 50
+    assert page.total == 1
+    assert page.page == 1
+    assert page.pages == 1
