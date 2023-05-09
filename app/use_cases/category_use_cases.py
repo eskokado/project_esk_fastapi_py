@@ -5,6 +5,7 @@ from fastapi.exceptions import HTTPException
 from fastapi import status
 from fastapi_pagination import Params
 from fastapi_pagination.ext.sqlalchemy import paginate
+from sqlalchemy import select
 
 
 class CategoryUseCases:
@@ -17,10 +18,10 @@ class CategoryUseCases:
         self.db_session.commit()
 
     def list_categories(self, page: int = 1, size: int = 50):
-        categories_query = self.db_session.query(CategoryModel)
+        categories_query = select(CategoryModel)
         params = Params(page=page, size=size)
 
-        return paginate(categories_query, params)
+        return paginate(self.db_session, categories_query, params)
 
     def delete_category(self, id: int):
         category_model = self.db_session.query(CategoryModel).filter_by(id=id).first()

@@ -26,6 +26,8 @@ class Product(Base):
     category_id = Column('category_id', ForeignKey('categories.id'), nullable=False)
     category = relationship('Category', back_populates='products')
 
+    __mapper_args__ = {"confirm_deleted_rows": False}
+
 
 class User(Base):
     __tablename__ = 'users'

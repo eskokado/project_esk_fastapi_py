@@ -1,7 +1,8 @@
 import pytest
 
 from app.schemas.product import Product, ProductOutput
-from app.schemas.category import Category
+from app.schemas.category import CategoryOutput
+
 
 def test_product_schema():
     product = Product(
@@ -56,7 +57,7 @@ def test_product_schema_invalid_price():
 
 
 def test_product_output_schema():
-    category = Category(name='Roupa', slug='roupa')
+    category = CategoryOutput(id=1, name='Roupa', slug='roupa')
 
     product_output = ProductOutput(
         id=1,
@@ -66,6 +67,8 @@ def test_product_output_schema():
         stock=10,
         category=category
     )
+
+    print(product_output.dict())
 
     assert product_output.dict() == {
         'id': 1,
