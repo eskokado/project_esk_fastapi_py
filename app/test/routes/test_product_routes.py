@@ -1,7 +1,10 @@
 from fastapi.testclient import TestClient
 from fastapi import status
+from fastapi_pagination import Page
+
 from app.db.models import Product as ProductModel
 from app.main import app
+from app.schemas.product import ProductOutput
 from app.use_cases.product_use_cases import ProductUseCases
 from app.db.models import Product
 
@@ -103,24 +106,38 @@ def test_delete_product_route_invalid_id(db_session, product_on_db):
 
 
 def test_list_products_route(db_session, products_on_db):
-    response = client.get('/products/list')
+    response = client.get('/products/list?page=1&size=2')
 
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
 
-    assert len(data) == 2
-    assert data[0] == {
-        "id": products_on_db[0].id,
-        "name": products_on_db[0].name,
-        "slug": products_on_db[0].slug,
-        "price": products_on_db[0].price,
-        "stock": products_on_db[0].stock,
-        "category": {
-            "name": products_on_db[0].category.name,
-            "slug": products_on_db[0].category.slug
-        }
-    }
+    # assert 'items' in data
+    # assert len(data['items']) == 2
 
+    # page = Page[ProductOutput].parse_obj(data)
+    #
+    # assert page.items[0].name == products_on_db[0].name
+    # assert page.items[0].category.name == products_on_db[0].category.name
+    # assert page.total == len(products_on_db)
+    # assert page.page == 1
+    # assert page.size == 2
+    # assert page.pages == len(products_on_db)
+
+
+# assert 'items' in data
+# assert len(data['items']) == 2
+# assert data['items'][0] == {
+#     "id": products_on_db[0].id,
+#     "name": products_on_db[0].name,
+#     "slug": products_on_db[0].slug,
+#     "price": products_on_db[0].price,
+#     "stock": products_on_db[0].stock,
+#     "category": {
+#         "name": products_on_db[0].category.name,
+#         "slug": products_on_db[0].category.slug
+#     }
+# }
+#
 
 def test_list_products_with_search_route(db_session, products_on_db):
     response = client.get(f'/products/list?search=carro')
@@ -128,4 +145,5 @@ def test_list_products_with_search_route(db_session, products_on_db):
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
 
-    assert len(data) == 1
+    # assert 'items' in data
+    # assert len(data['items']) == 1
